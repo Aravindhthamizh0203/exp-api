@@ -11,6 +11,9 @@ dotenv.config();
 dbconnect();
 //express .json
 app.use(express.json());
+app.get('/', (req, res) => {
+    res.json({ msh: "welcome to my app" })
+})
 //routes
 app.use('/api', userRoute);
 app.use(notFound);
