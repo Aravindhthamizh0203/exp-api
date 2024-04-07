@@ -1,3 +1,4 @@
+const generateToken = require("../../middleware/generateToken");
 const User = require("../../model/User");
 const expressasynchandler = require("express-async-handler");
 
@@ -29,7 +30,27 @@ const fetchAllUsersCtrl = expressasynchandler(async (req, res) => {
         res.json(error);
     }
 })
+//login user
+const loginUserCtrl = expressasynchandler(async (req, res) => {
+    const { email, password } = req.body;
+    //find the user in db
+    const userFound = await User.findOne({ email });
+    //check the password matches
+    if (userFound && (await userFound?.isPasswordMatch(password))) {
+        res.json({
+            _id: userFound?._id,
+            firstname: userFound?.firstname,
+            lastname: userFound?.lastname,
+            email: userFound?.email,
+            isAdmin: userFound?.isAdmin,
+            token: generateToken(userFound?._id)
+        });
+    } else {
+        res.status(401);
+        throw new Error('Invalid Login credentials')
+    }
+
+})
 
 
-
-module.exports = { registerUser, fetchAllUsersCtrl };
+module.exports = { registerUser, fetchAllUsersCtrl, loginUserCtrl };
